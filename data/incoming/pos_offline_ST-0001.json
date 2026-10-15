@@ -1,0 +1,14 @@
+{
+  "ticket_id": "TKT-000001",
+  "store_id": "ST-0001",
+  "asset_tag": "AST-00001",
+  "priority": "P1",
+  "symptom": "pos_offline",
+  "status": "open",
+  "created_at": "2026-10-15T19:07:31+00:00",
+  "subject": "POS offline cannot ring sales",
+  "description": "Register 1 shows offline since opening. Cannot process cards or cash sales. Other registers at this store appear fine. Manager: Maria Lopez.",
+  "requester_email": "manager@example.com",
+  "contact_phone": "+1-555-010-4821",
+  "pan": "4111-1111-1111-1111"
+}

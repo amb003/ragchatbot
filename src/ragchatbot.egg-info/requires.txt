@@ -1,0 +1,16 @@
+pydantic<3,>=2.5
+duckdb<2,>=1.0
+typer<1,>=0.12
+rich<14,>=13.7
+python-dotenv<2,>=1.0
+pyyaml<7,>=6.0
+httpx<1,>=0.27
+
+[dev]
+pytest<9,>=8.0
+
+[embeddings]
+sentence-transformers<4,>=3.0
+
+[ui]
+streamlit<2,>=1.28

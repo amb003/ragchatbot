@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "case_id": "pos_offline_happy",
+      "ticket_path": "data/incoming/pos_offline_ST-0001.json",
+      "expect_runbook_id": "rb-pos-offline",
+      "expect_escalate": true,
+      "expect_regional_path": false,
+      "approve_action": false
+    },
+    {
+      "case_id": "regional_outage_midwest",
+      "ticket_path": "data/incoming/regional_pos_offline_CHI.json",
+      "expect_runbook_id": "rb-regional-outage",
+      "expect_regional_path": true,
+      "approve_action": true
+    }
+  ]
+}

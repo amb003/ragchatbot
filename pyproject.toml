@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ragchatbot"
+version = "0.1.0"
+description = "IT support ticket orchestration with RAG (POC)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pydantic>=2.5,<3",
+  "duckdb>=1.0,<2",
+  "typer>=0.12,<1",
+  "rich>=13.7,<14",
+  "python-dotenv>=1.0,<2",
+  "pyyaml>=6.0,<7",
+  "httpx>=0.27,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0,<9"]
+embeddings = ["sentence-transformers>=3.0,<4"]
+ui = ["streamlit>=1.28,<2"]
+
+[project.scripts]
+ragchatbot = "ragchatbot.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,44 +1,76 @@
 # ragchatbot
-Chatbot for IT support
-ServeWell IT Support Agent Suite: End-to-End Design
-1. Frame the problem first
 
-Your solution should answer three questions for the panel:
+Ticket-oriented IT support orchestration for retail/POS: structured enrichment (DuckDB), hybrid RAG over runbooks, guardrails, gated actions, and eval.
 
-What gets better? Time to first response, L2 load, and store downtime.
-Why trust it? Every instruction is grounded, every action is gated, and everything is logged.
-How does it scale? One accelerator that onboards new incident types by adding runbooks and config, not code.
+## Stack
 
-Pilot scope: “POS offline at store” is the primary incident, and “receipt/kitchen printer not working” is the secondary one. These two share assets, network dependencies, and runbook structure, so the second one proves reusability.
+- Python 3.10+ (3.11+ recommended), plain orchestration — no LangChain/LlamaIndex
+- Pydantic, DuckDB, Typer, Rich, pytest, httpx
+- Open-weight LLMs via Groq → Cerebras → OpenRouter (OpenAI-compatible client, cache + throttle)
+- Local embeddings: `BAAI/bge-small-en-v1.5` (`pip install -e ".[embeddings]"`); hash fallback if not installed
 
-Core insight to build around: “POS offline” is not one problem. It is one of four:
+## Setup
 
-Device fault, which a runbook fixes.
-Store network or ISP fault, which needs a different runbook or the carrier.
-Regional or platform outage, where many stores report at once and no runbook helps.
-Payment or PCI-sensitive fault, which must be escalated.
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[dev,embeddings]"
+copy .env.example .env   # add GROQ_API_KEY etc.
+```
 
-An agent that checks telemetry and nearby tickets before applying a runbook is much more credible than one that matches keywords to a runbook.
+For offline demo without API keys:
 
-2. Architecture
-Incoming ticket (ITSM webhook / CSV / API)
-        │
-        ▼
- ┌─────────────── Orchestrator (explicit state machine) ───────────────┐
- │ 1 Intake & Sanitize  → validate schema, redact PII/card data,       │
- │                         prompt-injection screen                      │
- │ 2 Triage & Enrich    → classify, extract store/asset, pull asset,   │
- │                         ticket history, SLA, telemetry, regional     │
- │                         incident check (tools, no LLM guessing)      │
- │ 3 Diagnose/Route     → decide path: runbook | known outage |        │
- │                         escalate (policy rules + LLM)                │
- │ 4 Retrieve           → hybrid RAG with metadata filters + threshold │
- │ 5 Plan & Guide       → LLM drafts steps, each citing chunk IDs      │
- │ 6 Verify             → grounding check, policy check, confidence    │
- │ 7 Act                → tiered actions, approval gate                │
- │ 8 Summarize          → requester message + ticket note + L2 handoff │
- └──────────────┬───────────────────────────────┬──────────────────────┘
-                │                               │
-   Tools / Data layer                  Audit + Trace store
-   (SQL tables, vector index,          (append-only, per run_id)
-    ITSM stub, automation stub)
+```powershell
+$env:RAGCHATBOT_MOCK_LLM = "1"
+```
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `ragchatbot generate-data` | Synthetic DuckDB + sample tickets |
+| `ragchatbot index-runbooks` | Parse/chunk/embed runbooks under `data/runbooks/` |
+| `ragchatbot run --ticket <file.json>` | End-to-end ticket flow with Rich trace |
+| `ragchatbot run --ticket <file> --approve` | Approve gated simulated action |
+| `ragchatbot batch --dir data/incoming/` | Batch ticket processing |
+| `ragchatbot eval` | Golden-set regression runner |
+
+One-shot demo:
+
+```powershell
+.\scripts\demo.ps1
+```
+
+Optional HITL UI:
+
+```powershell
+pip install -e ".[ui]"
+streamlit run streamlit_app.py
+```
+
+## Pipeline (per ticket)
+
+1. **Intake + redaction** — PAN/phone patterns removed from working copy  
+2. **Enrichment** — DuckDB: store, asset, telemetry, history, SLA, regional incidents  
+3. **Hybrid retrieval** — dense + BM25 over runbook chunks (deprecated runbooks down-ranked)  
+4. **Cited steps** — extracted from top chunks; grounding overlap score vs threshold  
+5. **LLM insight** — structured summary (live API or mock)  
+6. **Gated action** — simulated `restart_pos_service` until `--approve`  
+7. **Escalation** — P1 prolonged offline, failed grounding, or escalation runbook path  
+8. **Audit log** — `data/logs/audit.jsonl`
+
+## Config
+
+- `config.yaml` — paths, models, retrieval thresholds  
+- `.env` — API keys (see `.env.example`)
+
+## Sample tickets
+
+- `data/incoming/pos_offline_ST-0001.json` — POS offline happy path  
+- `data/incoming/regional_pos_offline_CHI.json` — Midwest regional incident (ST-0002 / R-CHI)
+
+## Production notes (POC scope)
+
+- RBAC for runbooks and remediation actions  
+- ITSM credentials and change management for live actions  
+- Sample PAN data is synthetic for redaction testing only

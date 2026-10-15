@@ -1,0 +1,35 @@
+paths:
+  runbooks_dir: data/runbooks
+  synthetic_dir: data/synthetic
+  duckdb_path: data/synthetic/support.duckdb
+  manifest_path: data/synthetic/manifest.json
+
+llm:
+  primary_provider: groq
+  fallback_providers:
+    - cerebras
+    - openrouter
+  default_model: llama-3.3-70b-versatile
+  temperature: 0.2
+  max_tokens: 2048
+  cache_path: data/cache/llm_responses.jsonl
+  requests_per_minute: 30
+
+embeddings:
+  model_name: BAAI/bge-small-en-v1.5
+  device: cpu
+
+retrieval:
+  top_k_dense: 8
+  top_k_sparse: 8
+  top_k_final: 5
+  min_grounding_score: 0.65
+
+orchestrator:
+  audit_log_path: data/logs/audit.jsonl
+
+synthetic:
+  seed: 42
+  store_count: 50
+  asset_count: 300
+  ticket_count: 500
