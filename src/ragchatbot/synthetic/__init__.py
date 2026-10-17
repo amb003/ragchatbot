@@ -1,0 +1,3 @@
+from ragchatbot.synthetic.generator import generate_all
+
+__all__ = ["generate_all"]

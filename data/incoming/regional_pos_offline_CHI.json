@@ -1,0 +1,12 @@
+{
+  "ticket_id": "TKT-900001",
+  "store_id": "ST-0002",
+  "asset_tag": "AST-00002",
+  "priority": "P1",
+  "symptom": "pos_offline",
+  "status": "open",
+  "created_at": "2026-10-15T19:00:00+00:00",
+  "subject": "All POS offline at Chicago store",
+  "description": "All registers down simultaneously. Possible regional issue.",
+  "requester_email": "chi-manager@example.com"
+}

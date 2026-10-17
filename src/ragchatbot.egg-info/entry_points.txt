@@ -1,0 +1,2 @@
+[console_scripts]
+ragchatbot = ragchatbot.cli:main

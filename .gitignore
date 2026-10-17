@@ -1,0 +1,13 @@
+.env
+_uploaded_ticket.json
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+data/synthetic/
+data/index/
+data/cache/
+data/logs/
+*.duckdb
+.DS_Store
